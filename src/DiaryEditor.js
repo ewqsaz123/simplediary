@@ -23,7 +23,6 @@ const DiaryEditor = () =>{
             return;
         }
         if(state.content.length < 5){
-            //focus
             contentInput.current.focus();
             return;
         }
