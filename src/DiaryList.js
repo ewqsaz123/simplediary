@@ -1,28 +1,21 @@
-import DiaryItem from './DiaryItem.js';
+import DiaryItem from "./DiaryItem.js";
 
-const DiaryList = ({diaryList})=>{
-
-    return (
+const DiaryList = ({ diaryList, onRemove, onEdit }) => {
+  return (
     <div className="DiaryList">
-        <h2>일기 리스트</h2>
-        <h4>{diaryList.length}개의 일기가 있습니다.</h4>
-        <div>
-            {diaryList.map((it)=>(
-                <DiaryItem key={it.id} {...it}/>
-            ))} 
-
-        </div>
-    
-    
+      <h2>일기 리스트</h2>
+      <h4>{diaryList.length}개의 일기가 있습니다.</h4>
+      <div>
+        {diaryList.map((it) => (
+          <DiaryItem key={it.id} {...it} onRemove={onRemove} onEdit={onEdit} />
+        ))}
+      </div>
     </div>
-
-
-    );
-    
-}
+  );
+};
 
 DiaryList.defaultProps = {
-    diaryList : []
-}
+  diaryList: [],
+};
 
 export default DiaryList;

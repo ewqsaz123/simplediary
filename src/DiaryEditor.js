@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {useRef} from "react";
-const DiaryEditor = () =>{
+const DiaryEditor = ({onCreate}) =>{
     const authorInput = useRef();   //html DOM 요소에 접근할 수 있게됨
     const contentInput = useRef();   //html DOM 요소에 접근할 수 있게됨
     
@@ -26,7 +26,14 @@ const DiaryEditor = () =>{
             contentInput.current.focus();
             return;
         }
+
+        onCreate(state.author, state.content, state.emotion);
         alert("저장 성공");
+        setState({
+            author: "",
+            content: "",
+            emotion: 1,
+        });
     }
 
     return <div className="DiaryEditor">  
