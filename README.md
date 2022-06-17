@@ -170,6 +170,130 @@ useRef란?
 <img width="616" alt="Pasted Graphic 5" src="https://user-images.githubusercontent.com/20436113/173304467-b8d8ab5a-8020-42d2-a694-49ca55e798b6.png">
 
 
+# 6-5. React에서 배열 사용하기 2 - 데이터 추가하기
+
+- 컴포넌트 구조가 계층관계를 가질 때 “데이터” 는 아래 방향으로 흐르고, “이벤트”는 위 방향으로 올라간다. 
+	> useState를 이용해 데이터를 저장하고 보여주는 화면에서 데이터는 부모 컴포넌트에서 자식 컴포넌트로 전달되고 자식 컴포넌트에서 데이터를 새로 저장하는 이벤트는 부모 컴포넌트로 전달되면서 원 데이터에 새로운 데이터가 추가되는 이벤트가 실행된다.
+
+<useState와 useRef를 이용해 일기장 저장 및 보여주기 예제>
+
+[App.js]
+> onCreate 이벤트 함수는 일기장 편집화면인 DiaryEditor에 전달하여 이벤트 발생 시 다시 받을 수 있게 함
+> data는 리스트화면인 DiaryList에 전달
+
+![Pasted Graphic](https://user-images.githubusercontent.com/20436113/174047937-fe2d9d7f-38a2-4580-9ecf-cb84c48aaed2.png)
+
+
+
+
+[DiaryEditor.js]
+> prop으로 전달받은 onCreate 함수를 저장 버튼 클릭 시에 실행시킴
+
+![Pasted Graphic 1](https://user-images.githubusercontent.com/20436113/174047969-db5c9c99-ce68-49ec-a063-c3ce6bf54382.png)
+
+
+
+
+# 6-6.React에서 배열 사용하기 3 - 데이터 삭제하기
+
+<삭제하기 버튼 누를 시 데이터 삭제 예제>
+
+[App.js]
+> targetId 를 제외한 배열을 새로 만들어 data에 저장하는 onDelete함수 작성
+> onDelete 함수를 DiaryList로 전달
+
+![Pasted Graphic](https://user-images.githubusercontent.com/20436113/174048051-fe5423d4-d50e-4937-8730-34bcb2708b4c.png)
+
+
+
+[DiaryList.js]
+> diaryList로 onDelete를 전달받고 다시 DiaryItem으로 전달
+
+![Pasted Graphic 1](https://user-images.githubusercontent.com/20436113/174048080-776b0fe8-771a-430e-983b-173300d93719.png)
+
+
+
+[DiaryItem.js]
+>전달받은 이벤트 함수를 삭제 버튼 클릭 시에 실행하며 targetId를 매개변수로 전달
+
+![Pasted Graphic 2](https://user-images.githubusercontent.com/20436113/174048113-e196217b-df43-4be8-b72f-4b689484624b.png)
+
+
+
+# 6-7. React에서 배열 사용하기 4 - 데이터 수정하기
+
+- 데이터 삭제와 마찬가지로 DiaryItem 에 이벤트를 prop으로 전달하여 이벤트 발생시켜서 데이터 수정 처리. 
+- 예제에서는 데이터 수정 시 map() 을 이용함
+
+<수정 예제> 
+[DiaryItem.js]
+> 3항 연산자를 이용해 수정하기 버튼 클릭 시 textarea 활성화
+> prop으로 받은 onEdit 함수를 수정완료 시 실행
+
+<img width="696" alt="Pasted Graphic" src="https://user-images.githubusercontent.com/20436113/174048192-2ebd59fe-c1de-434e-aeef-5e6c9ea93a7a.png">
+<img width="696" alt="Pasted Graphic 1" src="https://user-images.githubusercontent.com/20436113/174048245-0302857b-87db-4590-8058-7a6fd034b2c2.png">
+
+
+
+
+[App.js]
+> onEdit 이벤트 작성 : map 을 이용해서 수정 할 요소 데이터를 처리
+> onEdit 함수를 DiaryItem에 전달하기 위해 DiaryItem의 부모 컴포넌트인 DiaryList에 전달
+
+<img width="696" alt="Pasted Graphic 2" src="https://user-images.githubusercontent.com/20436113/174048271-11c4162d-a9aa-46ef-a15f-c01535e654ae.png">
+
+
+# 6-8. React Lifecycle 제어하기 - useEffect
+
+
+- 리액트의 생애주기 :
+	1) Mount : 화면에 나타남
+	2) Update: 업데이트 , 리렌더
+	3) UnMount: 화면에서 사라짐
+
+- 리액트는 각 생애주기마다 사용할 수 있는 Method가 존재한다. 
+	> Mount(ComponentDidMount), Update(ComponentDidUpdate), UnMount(ComponentWillUnmount)
+- 그러나 이러한 메소드는 클래스형 컴포넌트 들에서만 사용할 수 있고 함수형 컴포넌트에서는 사용할 수가 없는데, ReactHooks 을 이용해 함수형 컴포넌트에서도 사용할 수 있다.
+- React Hooks이란? 클래스형 컴포넌트에서만 사용할 수 있는 함수들을 함수형 컴포넌트에서도 사용할 수 있도록 하는 기능. 상태 관리 기능인 useState 와 레퍼 참조 기능인 useRef 등의 기능도 실제로는 함수형 컴포넌트에서 사용이 불가한데 use키워드를 붙여서 함수형 컴포넌트에서도 사용할 수 있도록 만든 ReactHooks의 한 종류임. 
+	>클래스형 컴포넌트의 길어지는 코드 길이 문제, 중복 코드, 가독성 문제 등등을 해결하기 위해 등장.
+- 생애주기 함수도 ReactHooks의 한 종류인 useEffect 라는 것을 이용해 함수형 컴포넌트에서 사용함.
+
+
+<mount , update 함수 사용 예제>
+[LifeCycle.js]
+> useEffect는 매개변수로 callback 함수, 배열을 받음. 
+	>> 매개변수의 배열에 있는 값이 바뀔 때마다 callback 함수를 실행함.
+
+>배열 매개변수 삭제 시 mount 시점으로 해당 함수 실행됨
+>매개변수 있을 시 update 시점으로 해당 함수 실행됨
+
+<img width="696" alt="Pasted Graphic" src="https://user-images.githubusercontent.com/20436113/174048341-33313bfa-b9dd-4da0-8d4b-24c83d833a4d.png">
+<img width="696" alt="Pasted Graphic 2" src="https://user-images.githubusercontent.com/20436113/174048369-a4d4d810-55cf-4306-81b1-5d678c2b5a54.png">
+
+
+
+<구동화면 및 콘솔창>
+
+<img width="955" alt="Pasted Graphic 3" src="https://user-images.githubusercontent.com/20436113/174048396-bd95ccab-d319-4e13-8fe7-5d7d9cc06422.png">
+
+
+
+<Unmount 예제>
+> unmount 시점에는 mount 형식으로 된 useEffect의 콜백함수 내 리턴함수가 실행됨
+
+<img width="590" alt="Pasted Graphic 4" src="https://user-images.githubusercontent.com/20436113/174048445-9d1c8420-4349-495d-b8ae-d795e9a139a7.png">
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
