@@ -1,14 +1,13 @@
-import { useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { DiaryDispatchContext } from "./App.js";
 
-const DiaryItem = ({
-  onRemove,
-  author,
-  content,
-  emotion,
-  id,
-  created_date,
-  onEdit,
-}) => {
+const DiaryItem = ({ id, author, content, emotion, created_date }) => {
+  useEffect(() => {
+    console.log(id + "번 째 아이템 렌더!");
+  });
+
+  const { onRemove, onEdit } = useContext(DiaryDispatchContext);
+
   const [isEdit, setIsEdit] = useState(false); //수정 상태인지 여부 확인할 state
   const toggleIsEdit = () => setIsEdit(!isEdit); //수정 여부 바꾸는 토글함수
 
@@ -17,7 +16,7 @@ const DiaryItem = ({
   const [localContent, setLocalContent] = useState(content); //수정내용 넣을 state
 
   const handleRemove = () => {
-    console.log(id);
+    // console.log(id);
     if (window.confirm(id + "번째 일기를 정말 삭제하시겠습니까?")) {
       onRemove(id);
     }
@@ -79,4 +78,4 @@ const DiaryItem = ({
   );
 };
 
-export default DiaryItem;
+export default React.memo(DiaryItem);
