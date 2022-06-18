@@ -285,6 +285,193 @@ useRef란?
 
 
 
+# 6-9. React에서 API 호출하기
+
+
+<API 호출해서 일기장 목록을 셋팅하는 예제>
+[App.js]
+> fetch() 함수를 통해 api 호출 후 then의 resolve 호출 부분에서 결과를 json 으로 받아옴.
+> initdata 함수 선언 : json 결과를 20개까지만 가져온 후 map 을 이용해 각 요소에 접근한 후 객체로 리턴
+> setData(initdata) 를 통해 결과값을 state함수로 셋팅
+
+![Pasted Graphic 1](https://user-images.githubusercontent.com/20436113/174415410-ea2a85c7-23db-41ed-8692-090e624e9310.png)
+
+
+
+# 6-10. 최적화 1 - useMemo
+
+- Momoization : 이미 계산해 본 결과를 기억해 두었다가 동일한 계산을 시키면 다시 연산하지 않고 기억해두었던 데이터를 반환하는 방법.
+
+- useMemo : 리액트에서 Memoization 을 이용한 최적화 진행 시 사용되는 리액트의 기능.
+	> 매개변수로 콜백함수와 배열을 받으며, 배열의 내용이 변할 때마다 콜백함수가 실행됨
+
+<memoization을 이용해 감정숫자별 개수를 세는 예제>
+[App.js]
+> memoization을 안썼을 때
+>> 맨처음 setData([])를 통해 빈배열을 셋팅할 때 화면이 리렌더되면서 getDiaryAnalysis 가 호출되고, 그다음 api 호출 후 setData가 다시 호출될 때 또 한번 리렌더 되면서 getDiaryAnalysis가 호출됨.(App 컴포넌트도 하나의 함수이기 때문에 리렌더 될 때마다 전체 코드가 다시 실행됨)
+>>수정버튼 클릭하여 수정 후 수정완료 시 emotion은 수정하지도 않았는데 getDiaryAnalysis가 또 호출됨
+
+![Pasted Graphic](https://user-images.githubusercontent.com/20436113/174415429-51a9fba7-db86-4970-8b30-59b8f82fb41a.png)
+
+
+
+
+[구동화면 및 콘솔]
+> getDiaryAnalysis가 호출 될 때마다 찍히는 “일기 분석 시작” 텍스트가 두번씩 찍힌걸 볼 수 있음.
+> 아래 4개는 처음 화면 구동 시 찍히는 2개와 일기 내용 수정 시 찍히는 2개가 합쳐진 것
+
+![Pasted Graphic 1](https://user-images.githubusercontent.com/20436113/174415443-6b66441b-1237-43f8-9f1c-64a925a2729a.png)
+
+
+
+
+
+[App.js]
+> useMemo 적용 시
+> useMemo 의 배열요소로 전달한 data.length 가 바뀔때마다 callback 함수의 분석 부분이 실행됨.
+>> 수정 시에는 전체 리스트의 길이가 바뀌지 않기 때문에 굳이 분석부분(getDiaryAnalysis)이 재실행되지 않는 효율적인 코드로 바뀜.
+
+![Pasted Graphic 2](https://user-images.githubusercontent.com/20436113/174415451-4bcff16b-85d6-4e3f-9230-20beb19ea914.png)
+
+
+
+# 6-11. 최적화 2 - React.memo
+
+React.memo?
+- 컴포넌트는 자기의 부모컴포넌트가 re-render 될 때 자동으로 re-render가 됨. 이 때 굳이 re-render될 필요가 없는데도 무조건 re-render가 진행됨.이를 방지하기 위한 최적화 방법으로 React.memo를 사용할 수 있다.
+- React.memo는 고차 컴포넌트임.
+	> 고차 컴포넌트란? 컴포넌트를 가져와 새 컴포넌트를 반환하는 함수
+
+ [React.memo 예제]
+
+<OptimizeTest.js>
+> React.memo를 추가하면 “text”를 바꿀땐 TextView컴포넌트만 리렌더링되고, “count”가 바뀔 땐 CountView 컴포넌트만 리렌더링 됨.
+
+![Pasted Graphic](https://user-images.githubusercontent.com/20436113/174415468-3cba354e-083e-45c4-aba9-93202cf88d5e.png)
+
+
+[React.memo 객체 얕은 비교 예제]
+<OptimizeTest.js>
+
+>CounterB에서 obj는 얕은비교로 비교를 진행하기 때문에 다른 객체라고 생각해서 리렌더됨
+
+![1__#$!@%!#__Pasted Graphic](https://user-images.githubusercontent.com/20436113/174415479-b4379fc9-2388-4501-b0c5-dbf459687cb1.png)
+
+
+
+<구동화면 및 콘솔>
+
+>A button 과 B button 모두 6번씩 눌렀지만 CounterA는 리렌더 되지 않고 CounterB 컴포넌트만 리렌더됨
+
+![Pasted Graphic 1](https://user-images.githubusercontent.com/20436113/174415482-301f3408-7638-421c-a3e5-bd870199e4c0.png)
+
+
+
+
+
+- React.memo는 아래와 같이 함수 두개를 매개변수로 가짐.그 중 areEqual 함수가 값이 변경되었는지 판단하는 비교함수. 이 함수를 이용하여 비원시 타입 자료형에 대해 얕은비교를 하지 않도록 할 수 있음.
+
+![Pasted Graphic 2](https://user-images.githubusercontent.com/20436113/174415493-32dd3f31-6a89-4e0d-b7d5-e0bde5db31ee.png)
+
+
+
+
+[areEqual 함수 예제]
+<OptimizeTest.js>
+> areEqual 함수를 작성하여 React.memo 매개변수로 전달
+> 값만 비교하여 true/false를 반환하도록 함
+>> B button을 눌러도 값이 같이 때문에 리렌더 되지 않게 됨
+
+![Pasted Graphic 3](https://user-images.githubusercontent.com/20436113/174415495-16c79a42-4823-4911-a363-4ecfaab45c55.png)
+
+
+
+* React.memo를 export 문에 써도 됨 *
+
+![Pasted Graphic 4](https://user-images.githubusercontent.com/20436113/174415503-12636f2d-190f-413a-bf39-19a5d5317993.png)
+
+
+# 6-12.최적화 3 - useCallback
+
+- useCallback : 의존성 배열의 값이 바뀐지 확인하고 바뀌지 않았을 땐 메모이제이션된 콜백을 반환 
+> useMemo와의 차이점 : useMemo는 memoizedValue이고 useCallback은 memoizedCallback 임.
+
+[예제]
+<App.js>
+> onCreate함수가 DiaryEditor의 prop으로 전달되는데 이 때문에 DiaryEditor와 상관없는 DiaryList에서 삭제버튼을 누르고 리스트가 갱신될 때마다 DiaryEditor가 리렌더 됨.
+> 이러한 비효율적 리렌더를 방지하기 위해 onCreate함수를 useCallback으로 감싸서 처리.
+> 의존성 배열에 빈배열[]을 추가하게 되면 삭제버튼 클릭 시 리렌더는 막을 수 있지만 현재 상태의 값으로 빈배열[]을 기억하고 있기 때문에 일기장 새로 생성 시 기존의 리스트에 있더 일기 목록이 다 사라지는 현상이 발생.
+> 콜백함수에 setData부분에 매개변수를 함수로 처리하여 data라는 현재 상태의 리스트 값을 가질 수 있도록 변경.
+
+![Pasted Graphic](https://user-images.githubusercontent.com/20436113/174415513-fce1b3aa-83c5-4f6d-a6af-79b0b1baffd7.png)
+
+
+# 6-13. 복잡한 상태 관리 로직 분리하기 - useReducer
+
+useReducer ?
+- State를 특정 조건에 따라 나누어 실행할 수 있도록 로직을 분리하게 해줌. 
+- state와 유사하지만 dispatch와 reducer가 추가됨.
+>> 비구조화 할당 두가지 요소 : 상태에 대한 값을 가지는 data, 조건에 따라 상태변화를 일으키는 함수인 dispatch.
+>> 함수 매개변수 두가지 요소 : 조건에 따라 상태값을 다르게 반환 받는 reducer 함수, data의 초기값
+
+<img width="379" alt="Pasted Graphic" src="https://user-images.githubusercontent.com/20436113/174415524-193665ec-4342-4777-9d20-30f7a4643b41.png">
+
+
+
+<예제>
+[App.js]
+> App컴포넌트 바깥 부분에 reducer 함수 선언
+> reducer 매개변수 두가지 요소 : 현재 값을 가지는 state, dispatch에서 갖고들어온 새로운 객체인 action
+>>action.type에 따라 switch문을 통해 각기 다른 로직을 실행하여 리턴하도록 함.
+
+<img width="630" alt="Pasted Graphic 1" src="https://user-images.githubusercontent.com/20436113/174415529-9e788088-8226-44ea-829e-9d1c0a4225f0.png">
+
+
+
+
+> onCreate, onEdit, init, onRemove 상황에 따라 각기 다르게 dispatch 함수를 호출. 매개변수로 객체를 넣어주며 type 요소에는 switch문에서 구분할 type값을 전달.
+
+<img width="630" alt="Pasted Graphic 2" src="https://user-images.githubusercontent.com/20436113/174415534-c85637c5-e803-4fa5-a6bf-16a4220b674a.png">
+<img width="630" alt="Pasted Graphic 3" src="https://user-images.githubusercontent.com/20436113/174415543-45bc3086-e3ec-4165-ab21-476f62ae9693.png">
+
+
+# 6-14. 컴포넌트 트리에 데이터 공급하기 - Context
+
+- props driling : 최상위 컴포넌트(App)에서 데이터 및 함수를 전달할 때 트리 구조에서 최하위 컴포넌트에 전달을 하기 위해서 그 중간 컴포넌트는 관련 데이터를 사용하지 않음에도 props로 데이터를 전달받는 현상.
+	> ex) DiaryItem에서 onEdit 함수를 사용하기 위해 App에서 해당 함수를 DiaryList의 prop으로 전달 후 DiaryList에서는 그대로 DiaryItem의 prop으로 전달 -> 하위컴포넌트에서 사용을 하기 위해 트리구조대로 prop이 계속해서 전해짐
+
+- 위와 같은 현상을 방지하기 위해 리액트에서는 Provider라고 하는 데이터 공급자 역할을 생성할 수가 있음. 이 Provider는 트리 구조를 거치지 않고도 특정 컴포넌트에게 바로 데이터를 전달해줄 수 있음. 이 때 Provider가 관여하는 전체 boundary를 “Context”라고 함.
+
+<예제>
+[App.js]
+> Provider 사용을 위한 Context 생성
+>> DiaryStateContext: 일기장 data를 위한 Context
+>> DiaryDispatchContext : 일기장 조작 함수(onCreate, onEdit, onRemove)를 위한 Context
+
+<img width="587" alt="Pasted Graphic" src="https://user-images.githubusercontent.com/20436113/174415570-e177b6ad-24eb-4099-8332-15be050408e9.png">
+
+
+
+> 관련 컴포넌트를 Context로 감싸서 Provider를 사용할 수 있게 함
+> value 에는 하나의 데이터만 전달! : data, onCreate 등을 value에 한번에 전달하면 Provider도 컴포넌트의 한 종류이기 때문에 값이 바뀔 때마다 리렌더되고 기존에 적용한 최적화 코드들이 무효화되버림.
+
+<img width="571" alt="Pasted Graphic 1" src="https://user-images.githubusercontent.com/20436113/174415575-f48567a0-4dc5-4924-bf1e-17e46720ec07.png">
+
+
+[DiaryList.js]
+> prop으로 전달받던 코드는 사라지고, useContext(콘텍스트 이름) 의 함수를 호출 해서 데이터를 전달받음
+
+<img width="547" alt="Pasted Graphic 2" src="https://user-images.githubusercontent.com/20436113/174415579-73be3ae1-4e61-43d2-b91c-19dbc6cbad9c.png">
+
+
+
+[DiaryItem.js]
+> onRemove, onEdit 함수는 DiaryList를 거칠 필요없이 DiaryItem에서 바로 전달받아서 사용
+
+<img width="642" alt="Pasted Graphic 3" src="https://user-images.githubusercontent.com/20436113/174415588-987c9511-645b-4be3-bf56-9b61dfc9d08b.png">
+
+
+
 
 
 
